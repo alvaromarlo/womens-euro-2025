@@ -1,0 +1,22 @@
+name: Deploy to GCP
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  id-token: write # Requerido para solicitar el JWT de GitHub
+
+jobs:
+  job_id:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Autenticación Keyless
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
