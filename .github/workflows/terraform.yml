@@ -29,8 +29,8 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ vars.INFRA_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.INFRA_SERVICE_ACCOUNT }}
 
       # 2. Instalamos Terraform en la máquina de GitHub
       - name: Setup Terraform
@@ -47,4 +47,3 @@ jobs:
       # 5. Aplicamos los cambios automáticamente
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}"

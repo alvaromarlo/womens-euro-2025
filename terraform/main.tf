@@ -15,8 +15,7 @@ resource "google_storage_bucket" "datalake" {
 # ==========================================================
 resource "google_service_account" "github_actions_sa" {
   account_id   = "github-actions-sa-tf"
-  display_name = "GitHub Actions Service Account"
-  description  = "SA utilizada por GitHub Actions para desplegar y mover datos"
+  display_name = "GitHub Actions SA Data"
 }
 
 # Asignar los 3 roles exactos a la Cuenta de Servicio
@@ -40,8 +39,7 @@ resource "google_project_iam_member" "sa_roles_binding" {
 # ==========================================================
 resource "google_iam_workload_identity_pool" "github_pool" {
   workload_identity_pool_id = "github-actions-pool-tf"
-  display_name              = "GitHub Actions Pool"
-  description               = "Identity pool for GitHub Actions OIDC"
+  display_name              = "GitHub Actions Pool Data"
 }
 
 resource "google_iam_workload_identity_pool_provider" "github_provider" {
