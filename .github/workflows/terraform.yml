@@ -5,6 +5,7 @@ on:
     branches: [ "main" ] # Se ejecuta al subir cambios a main
     paths:
       - 'terraform/**'   # Solo se ejecuta si hay cambios en la carpeta terraform
+  workflow_dispatch: # ¡Esto añade un botón de "Run workflow" en la web de GitHub!
 
 permissions:
   contents: read

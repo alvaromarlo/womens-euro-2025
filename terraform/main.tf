@@ -71,3 +71,5 @@ resource "google_service_account_iam_member" "github_sa_binding" {
   # Le damos permiso específicamente a la identidad que coincida con tu repositorio
   member = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_repo}"
 }
+
+# Forzando ejecución de GitHub Actions
