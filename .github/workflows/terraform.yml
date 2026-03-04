@@ -1,0 +1,50 @@
+name: 'Terraform Deploy'
+
+on:
+  push:
+    branches: [ "main" ] # Se ejecuta al subir cambios a main
+    paths:
+      - 'terraform/**'   # Solo se ejecuta si hay cambios en la carpeta terraform
+
+permissions:
+  contents: read
+  id-token: write # Vital para conectarse a Google Cloud
+
+jobs:
+  terraform-apply:
+    name: 'Terraform Plan & Apply'
+    runs-on: ubuntu-latest
+    
+    # Le decimos que trabaje dentro de la carpeta terraform
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # 1. Nos autenticamos usando la configuración manual que ya tienes funcionando
+      - name: Autenticación Keyless en GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      # 2. Instalamos Terraform en la máquina de GitHub
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 3. Inicializamos Terraform (conecta con el bucket de estado)
+      - name: Terraform Init
+        run: terraform init
+
+      # 4. Vemos qué va a cambiar
+      - name: Terraform Plan
+        run: terraform plan -var="project_id=${{ vars.GCP_PROJECT_ID }}"
+
+      # 5. Aplicamos los cambios automáticamente
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}"
