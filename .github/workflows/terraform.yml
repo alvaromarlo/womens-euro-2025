@@ -44,6 +44,7 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var="project_id=${{ vars.GCP_PROJECT_ID }}"
 
-      # 5. Aplicamos los cambios automáticamente
+      # 5. Aplicamos los cambios automáticamente (¡Aquí faltaba el run!)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}"
