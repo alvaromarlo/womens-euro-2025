@@ -1,0 +1,79 @@
+name: 'Data Pipeline — Deploy Ingestion Function'
+
+on:
+  push:
+    branches: ['main']
+    paths: ['scripts/**']
+  pull_request:
+    branches: ['main']
+    paths: ['scripts/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # ──────────────────────────────────────────────
+  # JOB 1 · Lint y validación del código Python
+  # ──────────────────────────────────────────────
+  lint:
+    name: 'Lint'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r scripts/requirements.txt ruff
+
+      - name: Ruff — Lint
+        run: ruff check scripts/
+
+      - name: Ruff — Formato
+        run: |
+          ruff format scripts/
+          git diff --exit-code
+
+  # ──────────────────────────────────────────────
+  # JOB 2 · Despliegue (solo en push a main)
+  # ──────────────────────────────────────────────
+  deploy:
+    name: 'Deploy Cloud Function'
+    runs-on: ubuntu-24.04
+    needs: lint
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Autenticación Keyless en GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.DATA_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.DATA_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy Cloud Run Function (Gen 2)
+        run: |
+          gcloud functions deploy statsbomb-ingestion \
+            --gen2 \
+            --runtime=python312 \
+            --region=us-central1 \
+            --source=./scripts \
+            --entry-point=ingest_statsbomb_data \
+            --trigger-http \
+            --no-allow-unauthenticated \
+            --service-account=statsbomb-function-sa@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --set-env-vars=GCP_BUCKET_NAME=${{ vars.GCP_BUCKET_NAME }}

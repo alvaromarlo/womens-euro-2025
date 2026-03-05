@@ -1,0 +1,18 @@
+repos:
+  # Python — Ruff (lint + format)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^scripts/
+      - id: ruff-format
+        files: ^scripts/
+
+  # Terraform fmt — se aplica en CI (terraform no está instalado localmente)
+  # Para habilitarlo: instala terraform y descomenta estas líneas
+  # - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #   rev: v1.99.0
+  #   hooks:
+  #     - id: terraform_fmt
+  #       files: ^terraform/
