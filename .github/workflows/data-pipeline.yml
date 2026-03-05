@@ -39,7 +39,9 @@ jobs:
         run: ruff check scripts/
 
       - name: Ruff — Formato
-        run: ruff format --check scripts/
+        run: |
+          ruff format scripts/
+          git diff --exit-code
 
   # ──────────────────────────────────────────────
   # JOB 2 · Despliegue (solo en push a main)
