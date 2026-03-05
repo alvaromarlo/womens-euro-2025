@@ -35,7 +35,9 @@ def fetch_data(endpoint: str, match_id: int) -> list | None:
     return None
 
 
-def upload_to_gcs_idempotent(bucket: storage.Bucket, data: list | dict, destination_blob_name: str) -> None:
+def upload_to_gcs_idempotent(
+    bucket: storage.Bucket, data: list | dict, destination_blob_name: str
+) -> None:
     """
     Comprime el JSON en memoria a .gz y lo sube a GCS usando streaming.
     Aplica lógica idempotente: omite la subida si el archivo ya existe.
@@ -60,7 +62,9 @@ def ingest_statsbomb_data(request):
     """Punto de entrada HTTP para la Cloud Function de ingesta StatsBomb."""
     bucket_name = os.environ.get("GCP_BUCKET_NAME")
     if not bucket_name:
-        return {"error": "La variable de entorno GCP_BUCKET_NAME no está definida."}, 500
+        return {
+            "error": "La variable de entorno GCP_BUCKET_NAME no está definida."
+        }, 500
 
     logger.info(
         "Iniciando extracción — Competición: %d, Temporada: %d",
@@ -91,7 +95,9 @@ def ingest_statsbomb_data(request):
             # 2. Eventos
             events_data = fetch_data("events", match_id)
             if events_data:
-                events_path = f"bronze/statsbomb/events/match_id={match_id}/events.json.gz"
+                events_path = (
+                    f"bronze/statsbomb/events/match_id={match_id}/events.json.gz"
+                )
                 upload_to_gcs_idempotent(bucket, events_data, events_path)
 
             # 3. Datos espaciales (360)
@@ -103,7 +109,9 @@ def ingest_statsbomb_data(request):
             # 4. Alineaciones
             lineups_data = fetch_data("lineups", match_id)
             if lineups_data:
-                lineups_path = f"bronze/statsbomb/lineups/match_id={match_id}/lineups.json.gz"
+                lineups_path = (
+                    f"bronze/statsbomb/lineups/match_id={match_id}/lineups.json.gz"
+                )
                 upload_to_gcs_idempotent(bucket, lineups_data, lineups_path)
 
     except Exception as e:
