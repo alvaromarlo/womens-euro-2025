@@ -46,7 +46,9 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+        run: |
+          terraform fmt -recursive
+          git diff --exit-code
 
       - name: Terraform Init
         run: terraform init
