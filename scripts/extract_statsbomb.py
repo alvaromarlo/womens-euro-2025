@@ -11,7 +11,7 @@ from google.cloud import storage
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# --- CONFIGURACIÓN (sobreescribible via variables de entorno) ---
+# ---- CONFIGURACIÓN (sobreescribible via variables de entorno) ----
 COMPETITION_ID = int(os.environ.get("COMPETITION_ID", 53))
 SEASON_ID = int(os.environ.get("SEASON_ID", 315))
 BASE_URL = "https://raw.githubusercontent.com/statsbomb/open-data/master/data"
